@@ -2,6 +2,7 @@ use endpoints::Endpoint;
 use serde::Deserialize;
 use std::ops::Deref;
 
+pub mod client;
 pub mod data_types;
 pub mod endpoints;
 
@@ -85,41 +86,5 @@ pub fn get_with_auth<'de, E: Endpoint<'de>>(
     }
 }
 
-pub(crate) fn build_params(params: &[(&str, &str)]) -> String {
-    if params.is_empty() {
-        return String::new();
-    }
-
-    let len = params
-        .iter()
-        .fold(0, |acc, p| acc + 2 + p.0.len() + p.1.len());
-    let mut out = String::with_capacity(len);
-
-    let mut params_iter = params.iter();
-    let param = params_iter.next().unwrap(); // fine to unwrap because already checked for empty
-    out.push('?');
-    out.push_str(param.0);
-    out.push('=');
-    out.push_str(param.1);
-
-    for param in params_iter {
-        out.push('&');
-        out.push_str(param.0);
-        out.push('=');
-        out.push_str(param.1);
-    }
-
-    out
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_build_params() {
-        let pairs = [("master_id", "3175560"), ("page", "1"), ("per_page", "25")];
-        let built = build_params(&pairs);
-        assert_eq!(&built, "?master_id=3175560&page=1&per_page=25");
-    }
-}
+// temp reexport
+pub(crate) use client::build_params;
