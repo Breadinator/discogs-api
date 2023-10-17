@@ -8,19 +8,6 @@ impl<'a> Params<'a> {
     pub fn build(self) -> String {
         self.into()
     }
-
-    pub fn push(&'_ mut self, param: (&'a str, &'a str)) {
-        match self {
-            Self::Compiled(comp) => {
-                comp.reserve(2 + param.0.len() + param.1.len());
-                comp.push(if comp.is_empty() { '?' } else { '&' });
-                comp.push_str(param.0);
-                comp.push('=');
-                comp.push_str(param.1);
-            }
-            Self::Pairs(pairs) => pairs.push(param),
-        }
-    }
 }
 
 impl From<Params<'_>> for String {
@@ -74,14 +61,6 @@ mod tests {
     fn test_build_params() {
         let params =
             Params::Pairs([("master_id", "3175560"), ("page", "1"), ("per_page", "25")].to_vec());
-        let built = params.build();
-        assert_eq!(&built, "?master_id=3175560&page=1&per_page=25");
-    }
-
-    #[test]
-    fn test_push() {
-        let mut params = Params::Pairs([("master_id", "3175560"), ("page", "1")].to_vec());
-        params.push(("per_page", "25"));
         let built = params.build();
         assert_eq!(&built, "?master_id=3175560&page=1&per_page=25");
     }

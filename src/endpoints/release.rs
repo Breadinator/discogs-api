@@ -1,4 +1,6 @@
 use super::Endpoint;
+use crate::Error;
+use reqwest::Url;
 
 pub struct Release;
 
@@ -6,25 +8,26 @@ impl<'de> Endpoint<'de> for Release {
     type Parameters = isize;
     type ReturnType = crate::data_types::Release;
 
-    #[inline(always)]
-    fn get_endpoint(params: isize) -> String {
-        format!("/releases/{params}")
-    }
-
-    #[inline(always)]
-    fn get_endpoint_with_auth(params: Self::Parameters, personal_access_token: &str) -> String {
-        format!("/releases/{params}?token={personal_access_token}")
+    fn build_url(base: &Url, params: Self::Parameters) -> Result<Url, Error> {
+        base.join(&format!("/releases/{params}"))
+            .map_err(|_| Error::UrlError)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::{Auth, Client};
+
     use super::Release;
 
     #[test]
     fn basic() {
         let id = 27651927;
-        let _data = crate::get::<Release>(id).unwrap();
+        let _data = Client::builder()
+            .build()
+            .unwrap()
+            .get::<Release>(id)
+            .unwrap();
     }
 
     #[test]
@@ -32,6 +35,11 @@ mod tests {
         let id = 27651927;
         let pat = std::env::var("discogs-pat")
             .expect("expected personal access token in env var `discogs-pat`");
-        let _data = crate::get_with_auth::<Release>(id, &pat).unwrap();
+        let _data = Client::builder()
+            .auth(Auth::Token(pat))
+            .build()
+            .unwrap()
+            .get::<Release>(id)
+            .unwrap();
     }
 }

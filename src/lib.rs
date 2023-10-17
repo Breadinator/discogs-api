@@ -1,4 +1,13 @@
-use endpoints::Endpoint;
+#![warn(clippy::pedantic)]
+#![allow(
+    clippy::module_name_repetitions,
+    clippy::module_inception,
+    clippy::unreadable_literal
+)]
+//
+// temp lint allows
+#![allow(clippy::missing_errors_doc)]
+
 use serde::Deserialize;
 use std::ops::Deref;
 
@@ -6,7 +15,7 @@ pub mod client;
 pub mod data_types;
 pub mod endpoints;
 
-pub(crate) mod requester;
+pub use client::{Auth, Client};
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct ErrorResponse {
@@ -21,6 +30,8 @@ pub enum Error {
     ParseError(#[from] serde_json::Error),
     #[error("{0:?}")]
     DiscogsError(ParsedResponse<ErrorResponse>),
+    #[error("failed to build url")]
+    UrlError,
 }
 
 /// Wrapper for deserialized data.
@@ -62,29 +73,3 @@ impl<'de, T: Deserialize<'de>> ParsedResponse<T> {
         Ok(Self { b, data })
     }
 }
-
-pub fn get<'de, E: Endpoint<'de>>(
-    params: E::Parameters,
-) -> Result<ParsedResponse<E::ReturnType>, Error> {
-    let resp = requester::get::<'de, E>(params)?;
-    if resp.status().is_success() {
-        ParsedResponse::new(resp)
-    } else {
-        Err(Error::DiscogsError(ParsedResponse::new(resp)?))
-    }
-}
-
-pub fn get_with_auth<'de, E: Endpoint<'de>>(
-    params: E::Parameters,
-    personal_access_token: &'_ str,
-) -> Result<ParsedResponse<E::ReturnType>, Error> {
-    let resp = requester::get_with_auth::<E>(params, personal_access_token)?;
-    if resp.status().is_success() {
-        ParsedResponse::new(resp)
-    } else {
-        Err(Error::DiscogsError(ParsedResponse::new(resp)?))
-    }
-}
-
-// temp reexport
-pub(crate) use client::build_params;

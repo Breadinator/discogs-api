@@ -1,3 +1,7 @@
+use reqwest::Url;
+
+use crate::Error;
+
 use super::Endpoint;
 
 pub struct ReleaseRatingByUser;
@@ -12,29 +16,29 @@ impl<'de> Endpoint<'de> for ReleaseRatingByUser {
     type Parameters = Params<'de>;
     type ReturnType = serde_json::Value;
 
-    #[inline(always)]
-    fn get_endpoint(params: Self::Parameters) -> String {
-        format!("/releases/{}/rating/{}", params.release_id, params.username)
-    }
-
-    #[inline(always)]
-    fn get_endpoint_with_auth(params: Self::Parameters, personal_access_token: &str) -> String {
-        format!(
-            "/releases/{0}/rating/{1}?token={personal_access_token}",
+    fn build_url(base: &Url, params: Self::Parameters) -> Result<Url, Error> {
+        base.join(&format!(
+            "/releases/{}/rating/{}",
             params.release_id, params.username
-        )
+        ))
+        .map_err(|_| Error::UrlError)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::Client;
+
     #[test]
     fn empty_username() {
         let params = super::Params {
             release_id: 27651927,
             username: "",
         };
-        let resp = crate::get::<super::ReleaseRatingByUser>(params);
+        let resp = Client::builder()
+            .build()
+            .unwrap()
+            .get::<super::ReleaseRatingByUser>(params);
         if let Err(crate::Error::DiscogsError(err)) = resp {
             assert_eq!(&err.message, "The requested resource was not found.");
         } else {

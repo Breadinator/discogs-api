@@ -1,8 +1,11 @@
-use super::{Auth, ClientBuilder, Params};
+use super::{Auth, ClientBuilder};
+use crate::{endpoints::Endpoint, Error, ParsedResponse};
+use reqwest::Url;
 
 pub struct Client {
     pub(super) client: reqwest::blocking::Client,
     pub(super) auth: Option<Auth>,
+    pub(super) url_base: Url,
 }
 
 impl Client {
@@ -11,20 +14,20 @@ impl Client {
         ClientBuilder::new()
     }
 
-    pub(crate) fn get(
+    pub fn get<'de, E: Endpoint<'de>>(
         &self,
-        base: &str,
-        endpoint: &str,
-        mut params: Params,
-    ) -> Result<reqwest::blocking::Response, reqwest::Error> {
-        if let Some(Auth::Token(token)) = &self.auth {}
+        params: E::Parameters,
+    ) -> Result<ParsedResponse<E::ReturnType>, Error> {
+        let mut url = E::build_url(&self.url_base, params)?;
 
-        let built_params: String = params.into();
-        let mut url = String::with_capacity(base.len() + endpoint.len() + built_params.len());
-        url.push_str(base);
-        url.push_str(endpoint);
-        url.push_str(&built_params);
+        if let Some(Auth::Token(token)) = &self.auth {
+            url.query_pairs_mut().append_pair("token", token);
+        }
 
-        self.client.get(url).send()
+        self.client
+            .get(url)
+            .send()
+            .map_err(Error::NetError)
+            .and_then(ParsedResponse::new)
     }
 }

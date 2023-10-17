@@ -1,4 +1,6 @@
 use super::Endpoint;
+use crate::Error;
+use reqwest::Url;
 
 pub struct CommunityRating;
 
@@ -6,14 +8,9 @@ impl<'de> Endpoint<'de> for CommunityRating {
     type Parameters = isize;
     type ReturnType = crate::data_types::ReleaseRating;
 
-    #[inline(always)]
-    fn get_endpoint(params: Self::Parameters) -> String {
-        format!("/releases/{params}/rating")
-    }
-
-    #[inline(always)]
-    fn get_endpoint_with_auth(params: Self::Parameters, personal_access_token: &str) -> String {
-        format!("/releases/{params}/rating?token={personal_access_token}")
+    fn build_url(base: &Url, params: Self::Parameters) -> Result<Url, Error> {
+        base.join(&format!("/releases/{params}/rating"))
+            .map_err(|_| Error::UrlError)
     }
 }
 
@@ -24,6 +21,10 @@ mod tests {
     #[test]
     fn basic() {
         let id = 27651927;
-        let _data = crate::get::<CommunityRating>(id).unwrap();
+        let _data = crate::Client::builder()
+            .build()
+            .unwrap()
+            .get::<CommunityRating>(id)
+            .unwrap();
     }
 }
