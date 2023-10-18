@@ -35,11 +35,14 @@ mod tests {
         let id = 27651927;
         let pat = std::env::var("discogs-pat")
             .expect("expected personal access token in env var `discogs-pat`");
-        let _data = Client::builder()
+
+        let data = Client::builder()
             .auth(Auth::Token(pat))
             .build()
             .unwrap()
             .get::<Release>(id)
             .unwrap();
+
+        assert!(!data.images[0].resource_url.is_empty());
     }
 }

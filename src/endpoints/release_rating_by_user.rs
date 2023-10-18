@@ -38,11 +38,8 @@ mod tests {
         let resp = Client::builder()
             .build()
             .unwrap()
-            .get::<super::ReleaseRatingByUser>(params);
-        if let Err(crate::Error::DiscogsError(err)) = resp {
-            assert_eq!(&err.message, "The requested resource was not found.");
-        } else {
-            panic!("Failed in the wrong way.\n{resp:?}");
-        }
+            .get::<super::ReleaseRatingByUser>(params)
+            .unwrap();
+        dbg![resp];
     }
 }
