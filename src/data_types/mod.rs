@@ -1,3 +1,5 @@
+mod artist;
+mod fallible;
 mod image;
 mod master;
 mod master_versions;
@@ -5,9 +7,13 @@ mod named_resource;
 mod pagination;
 mod rating;
 mod release;
+mod release_rating_by_user;
+mod release_stats;
 mod track;
 mod video;
 
+pub use artist::*;
+pub use fallible::*;
 pub use image::*;
 pub use master::*;
 pub use master_versions::*;
@@ -15,5 +21,7 @@ pub use named_resource::*;
 pub use pagination::*;
 pub use rating::*;
 pub use release::*;
+pub use release_rating_by_user::*;
+pub use release_stats::*;
 pub use track::*;
 pub use video::*;

@@ -16,9 +16,8 @@ impl<'de> Endpoint<'de> for Release {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Auth, Client};
-
     use super::Release;
+    use crate::{Auth, Client};
 
     #[test]
     fn basic() {

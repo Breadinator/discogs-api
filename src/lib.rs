@@ -6,7 +6,7 @@
 )]
 //
 // temp lint allows
-#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::missing_errors_doc, clippy::missing_panics_doc)]
 
 pub mod client;
 pub use client::{Auth, Client};

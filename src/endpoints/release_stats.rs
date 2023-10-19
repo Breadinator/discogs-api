@@ -8,7 +8,7 @@ pub struct ReleaseStats;
 
 impl<'de> Endpoint<'de> for ReleaseStats {
     type Parameters = isize;
-    type ReturnType = serde_json::Value;
+    type ReturnType = crate::data_types::ReleaseStats;
 
     fn build_url(base: &Url, params: Self::Parameters) -> Result<Url, Error> {
         base.join(&format!("/releases/{params}/stats"))
@@ -24,10 +24,11 @@ mod tests {
     #[test]
     fn basic() {
         let id = 27736512;
-        let _data = dbg![Client::builder()
+        let data = dbg![Client::builder()
             .build()
             .unwrap()
             .get::<ReleaseStats>(id)
             .unwrap()];
+        assert!(!data.is_offensive);
     }
 }
