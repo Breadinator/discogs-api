@@ -29,12 +29,19 @@ impl Client {
     ///
     /// Use `Client::get` where possible to use the regular types.<br/>
     /// Use [`serde_json::Value`] as `R` to parse any valid response.
+    #[inline]
     pub fn get_custom_return_type<'a, 'b, E: Endpoint<'a>, R: Deserialize<'b>>(
         &self,
         params: E::Parameters,
     ) -> Result<ParsedResponse<R>, Error> {
-        let mut url = E::build_url(&self.url_base, params)?;
+        E::build_url(&self.url_base, params).and_then(|url| self.get_url(url))
+    }
 
+    /// This method only modifies the given url in that it will add the user token if applicable
+    pub fn get_url<'de, R>(&self, mut url: Url) -> Result<ParsedResponse<R>, Error>
+    where
+        R: Deserialize<'de>,
+    {
         if let Some(Auth::Token(token)) = &self.auth {
             url.query_pairs_mut().append_pair("token", token);
         }

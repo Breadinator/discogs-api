@@ -12,9 +12,10 @@ pub mod client;
 pub use client::{Auth, Client};
 pub mod data_types;
 pub mod endpoints;
+
 mod err;
-mod parsed_response;
 pub use err::*;
+mod parsed_response;
 pub use parsed_response::*;
 
 pub mod prelude {

@@ -1,5 +1,5 @@
 use super::Endpoint;
-use crate::{client::build_params, Error};
+use crate::{client::build_params, data_types::SortOrder, Error};
 use reqwest::Url;
 
 pub struct MasterVersions;
@@ -18,7 +18,7 @@ pub struct MasterVersionsParams {
     /// Filter by country of release
     pub country: Option<String>,
     pub sort: Option<MasterVersionsSort>,
-    pub sort_order: Option<MasterVersionsSortOrder>,
+    pub sort_order: Option<SortOrder>,
 }
 
 #[derive(Debug, Clone)]
@@ -40,21 +40,6 @@ impl AsRef<str> for MasterVersionsSort {
             Self::Label => "label",
             Self::CatNo => "catno",
             Self::Country => "country",
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum MasterVersionsSortOrder {
-    Asc,
-    Desc,
-}
-
-impl AsRef<str> for MasterVersionsSortOrder {
-    fn as_ref(&self) -> &str {
-        match self {
-            Self::Asc => "asc",
-            Self::Desc => "desc",
         }
     }
 }

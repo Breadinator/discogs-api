@@ -9,6 +9,7 @@ mod rating;
 mod release;
 mod release_rating_by_user;
 mod release_stats;
+mod sorting;
 mod track;
 mod video;
 
@@ -23,5 +24,6 @@ pub use rating::*;
 pub use release::*;
 pub use release_rating_by_user::*;
 pub use release_stats::*;
+pub use sorting::*;
 pub use track::*;
 pub use video::*;
