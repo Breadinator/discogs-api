@@ -1,4 +1,5 @@
 mod artist;
+mod artist_releases;
 mod fallible;
 mod image;
 mod master;
@@ -14,6 +15,7 @@ mod track;
 mod video;
 
 pub use artist::*;
+pub use artist_releases::*;
 pub use fallible::*;
 pub use image::*;
 pub use master::*;

@@ -13,7 +13,7 @@ pub struct ArtistReleasesParams {
 
 impl Endpoint<'_> for ArtistReleases {
     type Parameters = ArtistReleasesParams;
-    type ReturnType = serde_json::Value;
+    type ReturnType = crate::data_types::ArtistReleases;
 
     fn build_url(
         base: &reqwest::Url,
@@ -57,6 +57,25 @@ pub mod tests {
         let client = Client::default();
         let data = client.get::<ArtistReleases>(params).unwrap();
 
-        dbg![data];
+        assert_eq!(data.pagination.page, 1);
+        assert!(!data.releases.is_empty());
+        assert!(!data.releases[0].title.is_empty());
+    }
+
+    #[test]
+    fn with_auth() {
+        let artist_id = 2445772;
+        let params = ArtistReleasesParams {
+            artist_id,
+            ..Default::default()
+        };
+        let pat = std::env::var("discogs-pat")
+            .expect("expected personal access token in env var `discogs-pat`");
+
+        let client = Client::builder().auth(Auth::Token(pat)).build().unwrap();
+        let data = client.get::<ArtistReleases>(params).unwrap();
+
+        assert!(!data.releases[0].thumb.is_empty());
+        assert!(data.releases[0].stats.is_some());
     }
 }

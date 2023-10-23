@@ -42,6 +42,6 @@ mod tests {
             .get::<Release>(id)
             .unwrap();
 
-        assert!(!data.images[0].resource_url.is_empty());
+        assert!(!data.images.as_ref().unwrap()[0].resource_url.is_empty());
     }
 }
