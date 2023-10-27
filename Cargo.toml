@@ -1,8 +1,8 @@
 [package]
 name = "discogs-api"
-version = "0.0.3"
+version = "0.0.4"
 edition = "2021"
-repository = "https://github.com/Breadinator/ytmdl"
+repository = "https://github.com/Breadinator/discogs-api"
 description = "WIP api wrapper for Discogs"
 license-file = "LICENSE"
 
